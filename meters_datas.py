@@ -9,17 +9,20 @@ def main():
     datas = read_cvs(filename)
     print(datas)
     print(date_today())
-    print(meters_data_for_print(filename))
+    #print(meters_data_for_print(filename))
     choice = menu()
     if choice == '1':
-        update_meter_data(filename)
+        index, line = update_meter_data(filename)
+        write_line_csv(index, line, filename)
+
+        choice == menu()
     elif choice == '2':
         text = meters_data_for_print(filename)
         send_notification(text)
     elif choice == '3':
-        pass
+        print('Func to add new meter')
     else:
-            while choice != '1':
+            while choice not in '123':
                 choice = menu()   
 
 def read_cvs(filename):
@@ -31,11 +34,12 @@ def read_cvs(filename):
         for row_list in reader:
             data_list.append(row_list)
     print('Данные прочитаны из файла')
+
     return data_list
 
-def read_list(list, element):
-    '''Func get list and return n-element string'''
-    return list[element]
+def read_list(list, index):
+    '''Func get list and return index element string'''
+    return list[index]
 
 def menu():
     print("МЕНЮ\n\n1 - ОБНОВИТЬ показания\n2 - ОТПРАВИТЬ показания по email\n3 - ДОБАВИТЬ НОВЫЙ счетчик")
@@ -43,18 +47,28 @@ def menu():
 
 def update_meter_data(filename):
     print('Будем обновлять показания счетчика')
-    meter_number = input('Введите последние цифры номера счетчика ')
-    check_number = check_number_meter(meter_number, filename)
+    meter_number = input('Введите последние цифры номера счетчика: ')
+    index, line = check_number_meter(meter_number, filename)
+    #data = read_cvs(filename)
+    #data[index] = line
+    print('Нужно обновить строку')
+    print(line)
+    meter_data = input('Введите показания счетчика с запятой: ')
+    #Обновляем данные счетчика
+    line[2], line[3] = meter_data, str(date_today())
+    print(line)
+    return index, line
 
 def check_number_meter(number, filename):
     main_list = read_cvs(filename)
     for number_line in range(len(main_list)):
-        print(number_line)
+        #print(number_line)
         list = read_list(main_list[number_line], 0)
         print(list.split(' '))
         print(list.split(' ')[1])
         if list.split(' ')[1].endswith(number):
-            return print('Такой счетчик есть'), print(number_line)
+            print('Такой счетчик есть'), print(number_line)
+            return number_line, list.split(' ')
         else:
             print('Такого счетчика нет')
             continue
@@ -64,6 +78,20 @@ def date_today():
     today = datetime.date.today()
     print('Сегодня ' + str(today))
     return today
+
+def write_line_csv(index, line, filename):
+    '''Func that write csv file with meters datas'''
+    data = read_cvs(filename)
+    data[index] = [(' ').join(line)]
+    print(data)
+    today_date = str(date_today())
+    filename = today_date + ' meters_datas' + '.csv'
+    #meters_datas_list = data.split('\n')
+    with open(file=filename, mode="w", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile, delimiter=' ')
+        for list in data:
+            line = list[0].split()
+            writer.writerow(line)
 
 def meters_data_for_print(filename):
     '''Function that returns a text with datas for print or email'''
