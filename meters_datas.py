@@ -16,7 +16,7 @@ def main():
     filename = "meters_datas"
     datas = read_cvs(filename)
     #print(datas)
-    print("Сегодня" + str(date_today()) + "\n")
+    print("Сегодня " + str(date_today()) + "\n")
     #print(meters_data_for_print(filename))
     while True:
         choice = menu()
@@ -122,8 +122,8 @@ def meters_data_for_print(filename):
     return meters_data_for_print
 
 def send_notification(text):
-    email = ['ryabovd@outlook.com']
-    #email = ['pokazvodokanal@mail.ru']
+    #email = ['ryabovd@outlook.com']
+    email = ['pokazvodokanal@mail.ru']
     with open('settings.json', 'r', encoding='utf-8') as file:
         settings = json.load(file)
         sender = settings["sender"]
