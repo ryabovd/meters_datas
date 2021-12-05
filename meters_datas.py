@@ -2,6 +2,8 @@ import csv
 import datetime
 import smtplib
 import json
+import sys
+import argparse
 
 """
 meters_datas.csv structure (from left to right):
@@ -14,6 +16,20 @@ date of send's data)
 
 def main():
     filename = "meters_datas"
+    dict_params = get_params()
+    if len(dict_params) != 0:
+        if len(dict_params['change']) != 0:
+            list_changes = dict_params['change']
+            for i in range(len(list_changes) // 2):
+                meter_number = list_changes[i*len(list_changes) // 2]
+                meter_data = list_changes[i*len(list_changes) // 2 + 1]
+                index, line = check_number_meter(meter_number, filename)
+                line[2], line[3] = meter_data, str(date_today())
+                data, filename_with_date = write_line_csv(index, line, filename)
+                write_csv(filename, data)
+                write_csv(filename_with_date, data)
+                print('показания обновлены из аргументов')
+
     datas = read_cvs(filename)
     #print(datas)
     print("Сегодня " + str(date_today()) + "\n")
@@ -38,8 +54,20 @@ def main():
             print("THE END")
             break
         else:
-                continue   
+            continue   
 
+def get_params():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--change', nargs='*', help='change meter data')
+    args = parser.parse_args()
+    #print(len(args.change))
+    #print('***', args.change)
+    if len(args.change) % 2 == 0:
+        change_dict = {}
+        change_dict['change'] = args.change
+        #print('*', change_dict)
+        return change_dict
+ 
 def read_cvs(filename):
     '''Func that reads csv file (delimiter is '\n') and returns a list of data'''
     data_list = []
@@ -66,17 +94,21 @@ def menu():
 
 def update_meter_data(filename):
     print('Будем обновлять показания счетчика')
-    meter_number = input('Введите последние цифры номера счетчика: ')
-    index, line = check_number_meter(meter_number, filename)
-    #data = read_cvs(filename)
-    #data[index] = line
-    print(f'Обновляем данные счетчика {line[1]} \nПоследние показания {line[2]}')
-    #print(line)
-    meter_data = input('Введите показания счетчика с запятой: ')
-    #Обновляем данные счетчика
-    line[2], line[3] = meter_data, str(date_today())
-    #print(line)
-    return index, line
+    meter_number = input('Введите последние цифры номера счетчика или NO для выхода: ')
+    if meter_number == 'NO':
+        print('Выход из программы')
+        quit()
+    else:
+        index, line = check_number_meter(meter_number, filename)
+        #data = read_cvs(filename)
+        #data[index] = line
+        print(f'Обновляем данные счетчика {line[1]} \nПоследние показания {line[2]}')
+        #print(line)
+        meter_data = input('Введите показания счетчика с запятой: ')
+        #Обновляем данные счетчика
+        line[2], line[3] = meter_data, str(date_today())
+        #print(line)
+        return index, line
 
 def check_number_meter(number, filename):
     main_list = read_cvs(filename)
