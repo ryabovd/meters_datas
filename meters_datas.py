@@ -154,8 +154,8 @@ def meters_data_for_print(filename):
     return meters_data_for_print
 
 def send_notification(text):
-    email = ['ryabovd@outlook.com']
-    #email = ['pokazvodokanal@mail.ru']
+    #email = ['ryabovd@outlook.com']
+    email = ['pokazvodokanal@mail.ru']
     with open('settings.json', 'r', encoding='utf-8') as file:
         settings = json.load(file)
         sender = settings["sender"]
@@ -174,6 +174,11 @@ def send_notification(text):
 if __name__ == "__main__":
     main()
 
+# Наладить работу без параметров
 # Удалить отладку из функции поиска счетчика
 # Написать функцию записи даты передачи показаний
 # Определить как работать: немедленная запись каждого измения в файл или работать в оперативной памяти или запись во временный файл изменений
+# Дополнить меню пунктом просмотра показаний с датами передачи
+# Улучшить возможность чтения из командной строки. Для ввода нескольких счетчиков с показаниями
+# Написать исключение для отслеживания ошибки неправильного номера счетчика
+# Написать функцию проверки показиний, чтобы не записывать показания меньше текущих
